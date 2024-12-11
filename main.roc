@@ -5,6 +5,7 @@ import pf.Stderr
 import pf.Arg
 import pf.File
 import Day1
+import Day11
 
 main =
     args = Arg.list! {}
@@ -18,7 +19,8 @@ main =
                     |> Task.attempt \r ->
                         when r is
                             Ok input ->
-                                summary = summarize (part1 input) (part2 input)
+                                trimmed_input = input |> Str.trim
+                                summary = summarize (part1 trimmed_input) (part2 trimmed_input)
                                 Stdout.line! summary
 
                             Err _ -> Stderr.line! "Error when reading '$(path)'. Does the file exist?"
@@ -31,6 +33,7 @@ main =
 pickSolver = \day ->
     when day is
         1 -> Ok { part1: Day1.part1, part2: Day1.part2 }
+        11 -> Ok { part1: Day11.part1, part2: Day11.part2 }
         otherDay -> Err (Unsolved otherDay)
 
 summarize = \part1Solution, part2Solution ->

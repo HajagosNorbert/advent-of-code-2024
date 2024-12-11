@@ -1,6 +1,6 @@
 module [unwrap]
 
-unwrap = \res, msg ->
+unwrap = \res ->
     when res is
         Ok a -> a
-        Err _ -> crash msg
+        Err e -> crash "unwrapped on $(Inspect.toStr e)"

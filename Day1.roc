@@ -53,10 +53,10 @@ separate_ids = \input ->
 into_pairs = \input ->
     rows = Str.splitOn input "\n"
     list_of_pair = List.map rows \row ->
-        { after, before } = Str.splitFirst row "   " |> Utils.unwrap "malformed input"
+        { after, before } = Str.splitFirst row "   " |> unwrap
         {
-            left: Str.toI64 before |> unwrap "NaN",
-            right: Str.toI64 after |> unwrap "NaN",
+            left: Str.toI64 before |> unwrap,
+            right: Str.toI64 after |> unwrap,
         }
     list_of_pair
     
