@@ -6,7 +6,7 @@ part1 = \input ->
     ids = separate_ids input
     left_ids= List.sortAsc ids.left_ids
     right_ids= List.sortAsc ids.right_ids
-    distances = List.map2 left_ids right_ids calc_distance
+    distances = List.map2 left_ids right_ids Num.absDiff
     result = List.sum distances
     Num.toStr result
 
@@ -39,9 +39,6 @@ part2 = \input ->
     result = Dict.walk occurences 0 \sum, num, (l, r) -> sum + (num*l*r)
     Num.toStr result
 
-
-calc_distance = \n1, n2 ->
-    Num.abs (n1 - n2)
 
 separate_ids = \input ->
     list_of_pairs = into_pairs input
