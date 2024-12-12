@@ -4,41 +4,40 @@ import Utils exposing [unwrap]
 
 part1 = \input ->
     ids = separate_ids input
-    left_ids= List.sortAsc ids.left_ids
-    right_ids= List.sortAsc ids.right_ids
+    left_ids = List.sortAsc ids.left_ids
+    right_ids = List.sortAsc ids.right_ids
     distances = List.map2 left_ids right_ids Num.absDiff
     result = List.sum distances
     Num.toStr result
 
-part2 = \input -> 
+part2 = \input ->
     pairs = into_pairs input
     empty_occurences = Dict.empty {}
 
     increment_left = \occurance_amount ->
         when occurance_amount is
-            Ok (l,r) -> Ok (l + 1, r)
+            Ok (l, r) -> Ok (l + 1, r)
             Err Missing -> Ok (1, 0)
 
     increment_right = \occurance_amount ->
         when occurance_amount is
-            Ok (l,r) -> Ok (l, r + 1)
+            Ok (l, r) -> Ok (l, r + 1)
             Err Missing -> Ok (0, 1)
 
     increment_both = \occurance_amount ->
         when occurance_amount is
-            Ok (l,r) -> Ok (l+1, r + 1)
+            Ok (l, r) -> Ok (l + 1, r + 1)
             Err Missing -> Ok (1, 1)
 
-    occurences = List.walk pairs empty_occurences \occ, {left, right} ->
+    occurences = List.walk pairs empty_occurences \occ, { left, right } ->
         if left == right then
             Dict.update occ left increment_both
         else
             Dict.update occ left increment_left
             |> Dict.update right increment_right
 
-    result = Dict.walk occurences 0 \sum, num, (l, r) -> sum + (num*l*r)
+    result = Dict.walk occurences 0 \sum, num, (l, r) -> sum + (num * l * r)
     Num.toStr result
-
 
 separate_ids = \input ->
     list_of_pairs = into_pairs input
@@ -59,7 +58,6 @@ into_pairs = \input ->
             right: Str.toI64 after |> unwrap,
         }
     list_of_pair
-    
 
 sample_input1 =
     """
