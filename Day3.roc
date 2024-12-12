@@ -2,43 +2,60 @@ module [part1, part2]
 
 import Utils exposing [unwrap]
 
-part1 =\ input ->
-    solve1 (input |> Str.toUtf8) |> Num.toStr
+part1 = \input ->
+    solve input Bool.false
 
-solve1 = \initial_input ->
-    help =\input, state, sum ->
-        when (state,input) is
-            # (a, [])-> sum 
-            (Start, []) |(Num1, []) |(Comma _, []) | (ClosingParen _ _, []) -> sum 
+solve = \initial_input, allowConditionals ->
+    help = \input, state, sum ->
+        if allowConditionals then
+            when input is
+                ['d', 'o', 'n', '\'', 't', '(', ')', .. as rest] ->
+                    help rest Skipping sum
+
+                ['d', 'o', '(', ')', .. as rest] ->
+                    help rest Start sum
+
+                _ ->
+                    decode input state sum
+        else
+            decode input state sum
+    decode = \input, state, sum ->
+        when (state, input) is
+            # (a, [])-> sum
+            (Start, []) | (Num1, []) | (Comma _, []) | (ClosingParen _ _, []) | (Skipping, []) -> sum
+            (Skipping, [_, .. as rest]) -> help rest Skipping sum
             (Start, ['m', 'u', 'l', '(', .. as rest]) ->
                 help rest Num1 sum
+
             (Start, [_, .. as rest]) -> help rest Start sum
-            (Num1, inp) -> 
+            (Num1, inp) ->
                 when parseNumber inp is
                     Err remaining -> help remaining Start sum
                     Ok num remaining -> help remaining (Comma num) sum
+
             (Comma num1, [',', .. as rest]) -> help rest (Num2 num1) sum
             (Comma _, [_, .. as rest]) -> help rest Start sum
             (Num2 num1, inp) ->
                 when parseNumber inp is
                     Err remaining -> help remaining Start sum
                     Ok num2 remaining -> help remaining (ClosingParen num1 num2) sum
-            (ClosingParen num1 num2, [')', .. as rest]) -> help rest Start (sum + num1 * num2)
-            (ClosingParen _ _, [_, .. as rest]) -> help rest Start sum 
 
-    help initial_input Start 0
-    
+            (ClosingParen num1 num2, [')', .. as rest]) -> 
+                help rest Start (sum + num1 * num2)
+            (ClosingParen _ _, [_, .. as rest]) -> help rest Start sum
+
+    help (initial_input |> Str.toUtf8) Start 0 |> Num.toStr
+
 parseNumber = \initial_input ->
     countDigits = \input, digits ->
         when input is
             [] -> digits
-            [a, .. as rest] if digit a -> countDigits rest (digits+1) 
-            [_, .. ] -> digits
+            [a, .. as rest] if digit a -> countDigits rest (digits + 1)
+            [_, ..] -> digits
 
-
-    count = countDigits initial_input 0 
-    {before, others} = List.splitAt initial_input count
-    if 1 <= count && count <=  3 then
+    count = countDigits initial_input 0
+    { before, others } = List.splitAt initial_input count
+    if 1 <= count && count <= 3 then
         num = Str.fromUtf8 before |> unwrap |> Str.toU64 |> unwrap
         Ok num others
     else
@@ -47,14 +64,20 @@ parseNumber = \initial_input ->
 digit = \char ->
     '0' <= char && char <= '9'
 
-part2 =\ input ->
-    "hi"
+part2 = \input ->
+    solve input Bool.true
 
 sample_input = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
+sample_input2 = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
 
 expect
     got = part1 sample_input
     expected = "161"
+    got == expected
+
+expect
+    got = part2 sample_input2
+    expected = "48"
     got == expected
 
 expect

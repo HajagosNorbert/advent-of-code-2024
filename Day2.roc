@@ -24,14 +24,14 @@ retryUnsafeReport = \report, safety ->
     when safety is
         Safe -> Safe
         Unsafe faultyIdx ->
-            safety_without_middle = isSafe (List.dropAt report faultyIdx) 
+            safety_without_middle = isSafe (List.dropAt report faultyIdx)
             when safety_without_middle is
                 Safe -> Safe
-                Unsafe _ -> 
-                    safety_without_right = isSafe (List.dropAt report (faultyIdx+1)) 
+                Unsafe _ ->
+                    safety_without_right = isSafe (List.dropAt report (faultyIdx + 1))
                     when safety_without_right is
                         Safe -> Safe
-                        Unsafe _ if faultyIdx > 0 -> isSafe (List.dropAt report (faultyIdx-1)) 
+                        Unsafe _ if faultyIdx > 0 -> isSafe (List.dropAt report (faultyIdx - 1))
                         Unsafe _ -> Unsafe faultyIdx
 
 parseInput = \input ->
@@ -51,7 +51,7 @@ isSafe = \initialReport ->
                 if safely_ascending diff then
                     help rest Asc (idx + 1)
                 else if safely_descending diff then
-                    help rest Desc (idx +1)
+                    help rest Desc (idx + 1)
                 else
                     Unsafe idx
 
