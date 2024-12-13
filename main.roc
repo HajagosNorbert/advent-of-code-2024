@@ -43,5 +43,5 @@ pickSolver = \day ->
 summarize = \part1Solution, part2Solution ->
     """
     Part 1: $(part1Solution)
-    Part 1: $(part2Solution)
+    Part 2: $(part2Solution)
     """
