@@ -3,11 +3,10 @@ module [part1, part2]
 import Utils exposing [unwrap]
 
 part1 = \input ->
-    solve1 input 
+    solve1 input
 
 part2 = \input ->
-    solve2 input 
-
+    solve2 input
 
 solve1 = \initial_input ->
     help = \input, state, sum ->
@@ -31,46 +30,47 @@ solve1 = \initial_input ->
                     Err remaining -> help remaining Start sum
                     Ok num2 remaining -> help remaining (ClosingParen num1 num2) sum
 
-            (ClosingParen num1 num2, [')', .. as rest]) -> 
+            (ClosingParen num1 num2, [')', .. as rest]) ->
                 help rest Start (sum + num1 * num2)
+
             (ClosingParen _ _, [_, .. as rest]) -> help rest Start sum
 
     help (initial_input |> Str.toUtf8) Start 0 |> Num.toStr
 
-
 solve2 = \initial_input ->
     help = \input, state, sum ->
-            when input is
-                ['d', 'o', 'n', '\'', 't', '(', ')', .. as rest] ->
-                    help rest Skipping sum
+        when input is
+            ['d', 'o', 'n', '\'', 't', '(', ')', .. as rest] ->
+                help rest Skipping sum
 
-                ['d', 'o', '(', ')', .. as rest] ->
-                    help rest Start sum
+            ['d', 'o', '(', ')', .. as rest] ->
+                help rest Start sum
 
-                _ ->
-                    when (state, input) is
-                        # (a, [])-> sum
-                        (Start, []) | (Num1, []) | (Comma _, []) | (ClosingParen _ _, []) | (Skipping, []) -> sum
-                        (Skipping, [_, .. as rest]) -> help rest Skipping sum
-                        (Start, ['m', 'u', 'l', '(', .. as rest]) ->
-                            help rest Num1 sum
+            _ ->
+                when (state, input) is
+                    # (a, [])-> sum
+                    (Start, []) | (Num1, []) | (Comma _, []) | (ClosingParen _ _, []) | (Skipping, []) -> sum
+                    (Skipping, [_, .. as rest]) -> help rest Skipping sum
+                    (Start, ['m', 'u', 'l', '(', .. as rest]) ->
+                        help rest Num1 sum
 
-                        (Start, [_, .. as rest]) -> help rest Start sum
-                        (Num1, inp) ->
-                            when parseNumber inp is
-                                Err remaining -> help remaining Start sum
-                                Ok num remaining -> help remaining (Comma num) sum
+                    (Start, [_, .. as rest]) -> help rest Start sum
+                    (Num1, inp) ->
+                        when parseNumber inp is
+                            Err remaining -> help remaining Start sum
+                            Ok num remaining -> help remaining (Comma num) sum
 
-                        (Comma num1, [',', .. as rest]) -> help rest (Num2 num1) sum
-                        (Comma _, [_, .. as rest]) -> help rest Start sum
-                        (Num2 num1, inp) ->
-                            when parseNumber inp is
-                                Err remaining -> help remaining Start sum
-                                Ok num2 remaining -> help remaining (ClosingParen num1 num2) sum
+                    (Comma num1, [',', .. as rest]) -> help rest (Num2 num1) sum
+                    (Comma _, [_, .. as rest]) -> help rest Start sum
+                    (Num2 num1, inp) ->
+                        when parseNumber inp is
+                            Err remaining -> help remaining Start sum
+                            Ok num2 remaining -> help remaining (ClosingParen num1 num2) sum
 
-                        (ClosingParen num1 num2, [')', .. as rest]) -> 
-                            help rest Start (sum + num1 * num2)
-                        (ClosingParen _ _, [_, .. as rest]) -> help rest Start sum
+                    (ClosingParen num1 num2, [')', .. as rest]) ->
+                        help rest Start (sum + num1 * num2)
+
+                    (ClosingParen _ _, [_, .. as rest]) -> help rest Start sum
 
     help (initial_input |> Str.toUtf8) Start 0 |> Num.toStr
 
