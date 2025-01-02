@@ -2,3 +2,8 @@
 !/**/
 !*.*
 /inputs/*.txt
+
+
+# Added by cargo
+
+/target
